@@ -1,0 +1,116 @@
+1. 亚马逊各国家站点的绩效团队的邮箱（使用英文发送邮件）
+US: seller-performance@amazon.com
+UK: seller-performance@amazon.co.uk
+FR: performance-vendeur@amazon.fr
+DE: verkaeufer-performance@amazon.de
+JP: alliance@amazon.co.jp
+ES: performance-vendedor@amazon.es
+IT: performance-venditore@amazon.it
+CA: seller-performance@amazon.ca
+
+2. 亚马逊 VE 账号申请邮箱
+vendorexpress@amazon.com
+
+3. 外观专利侵权邮箱
+copyright@amazon.com
+
+4. 亚马逊账号冻结后的余额处理邮箱
+payments-funds@amazon.com
+
+5. 收到恶意攻击或者敲诈邮件投诉邮箱
+
+investigate@amazon.com
+
+投诉标题：「feedback abuse report」+「卖家店铺名」
+
+6. 跟卖投诉入口
+从 AM 后台 Contact Seller Support 开 case 投诉
+https://sellercentral.amazon.com/hz/contact-us
+以权利人身份投诉侵权
+https://www.amazon.com/gp/help ... ement
+以买家身份 test buy 投诉
+http://www.amazon.com/gp/help/reports/contact-us
+
+邮件标题写：Possible fraudulent sellers
+
+邮件内容：
+
+Seller's name: 店铺链接1
+
+Seller's name: 店铺链接2
+
+We believe above sellers are engaging in fraudulent activity.
+
+Please investigate.
+
+不需要写其他内容，只用让这些店铺在Seller Performance绩效团队的审核一遍，最多1周可能就消失了。
+
+举报这类的邮件，可以用新的邮箱发送，建议不要用用亚马逊注册邮箱发送，避免绩效邮件审核我们自己店铺，而受到牵连。
+
+
+7. 亚马逊总裁贝索斯的邮箱
+
+jeff@amazon.com
+
+8. 亚马逊官方邮箱
+
+notice@amazon.com
+
+seller-evaluation@amazon.com
+
+pq-review@amazon.com
+
+account-confirmation@amazon.com
+
+cn-seller-verification-enquiry@amazon.co.uk
+
+9. 账号不能登录的情况下移除 FBA 库存的邮箱
+payments-investigate@amazon.com
+咨询你的店铺产品清单，告诉亚马逊你需要移除库存，亚马逊会给你一个产品清单和移除库存的流程。
+
+10. 各站点产品质量(PQ)问题申诉邮箱
+US:seller-performance-policy@amazon.com
+UK:seller-performance-policy@amazon.co.uk
+FR:politique-performance-vendeur@amazon.fr
+DE:verkaeufer-performance-richtlinie@amazon.de
+IT:performance-venditore-politiche-di-condotta@amazon.it
+ES:politicas-performance-vendedor@amazon.es
+IN:seller-performance-policy@amazon.in
+MX:politicas-performance-vendedor@amazon.com.mx
+
+11. 各站点店铺关闭后货款申诉邮箱
+US:merchant-reserve-inquiry@amazon.com
+CA:payments-investigate@amazon.ca
+UK:payments-investigate@amazon.co.uk
+FR:investigation-amzpayments@amazon.fr
+DE:payments-nachforschungen@amazon.de
+IT:payments-investigate@amazon.it
+ES:investigacion-pagos@amazon.es
+IN:payments-investigate@amazon.in
+MX:payments-funds@amazon.com.mx
+
+12. 支付相关支持团队邮箱
+
+payments-funds@amazon.com
+
+美国站–merchant-reserve-inquiry@amazon.com
+
+英国站–payments-investigate@amazon.co.uk
+
+法国站–investigation-amzpayments@amazon.fr
+
+德国站–payments-nachforschungen@amazon.de
+
+意大利站–payments-investigate@amazon.it
+
+西班牙站–investigacion-pagos@amazon.es
+
+印度站–payments-investigate@amazon.in
+
+加拿大站–payments-investigate@amazon.ca
+
+墨西哥站–payments-funds@amazon.com.mx
+
+13. 刚跨进电商们想要了解亚马逊平台的产品安全政策时可以使用的邮箱
+
+safety-policy@amazon.com
