@@ -1,0 +1,1000 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Amazon 运营计算工具｜2026 FBA 配送费 + 利润核算</title>
+<style>
+:root{
+  --bg:#f4f6f8;--card:#fff;--text:#17202a;--muted:#667085;--line:#e4e7ec;
+  --blue:#146eb4;--blue2:#0f5c94;--orange:#ff9900;--green:#14804a;--greenbg:#eaf8ef;
+  --red:#b42318;--yellow:#fff3a3;--nav:#172a3a;--nav2:#20384c;--soft:#f8fafc;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select{font:inherit}
+.app{min-height:100vh;display:grid;grid-template-columns:235px 1fr}
+.sidebar{background:var(--nav);color:#fff;padding:22px 16px;position:sticky;top:0;height:100vh}
+.brand{font-size:18px;font-weight:900;padding:6px 10px 18px;border-bottom:1px solid rgba(255,255,255,.12)}
+.brand small{display:block;color:#9eb4c5;font-size:11px;font-weight:500;margin-top:5px}
+.nav{margin-top:18px;display:flex;flex-direction:column;gap:8px}
+.nav button{width:100%;border:0;border-radius:10px;padding:12px;text-align:left;background:transparent;color:#dbe7ef;font-weight:700;cursor:pointer}
+.nav button:hover{background:var(--nav2)}
+.nav button.active{background:#146eb4;color:#fff}
+.nav-icon{display:inline-block;width:23px}
+.main{min-width:0}
+.page{display:none;padding:24px}
+.page.active{display:block}
+.container{max-width:1280px;margin:auto}
+.hero{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:18px}
+.hero h1{margin:0 0 7px;font-size:27px;letter-spacing:-.3px}
+.hero p{margin:0;color:var(--muted);font-size:14px;line-height:1.65}
+.version{white-space:nowrap;background:#eef6ff;color:#0b5e9c;border:1px solid #cfe6fb;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800}
+.layout{display:grid;grid-template-columns:1.02fr .98fr;gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 4px 14px rgba(16,24,40,.04);padding:20px}
+.card h2{margin:0 0 16px;font-size:18px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.field label{display:block;margin-bottom:6px;font-size:13px;font-weight:750}
+.field .help{margin-top:5px;color:var(--muted);font-size:11px;line-height:1.45}
+.input-row{display:flex;gap:8px}
+input,select{width:100%;height:42px;padding:0 11px;border:1px solid #cfd4dc;border-radius:9px;background:#fff;color:#1d2939}
+input:focus,select:focus{outline:2px solid rgba(20,110,180,.15);border-color:var(--blue)}
+input.editable{background:#fff9ce;border-color:#e9d265}
+.toggle{display:flex;align-items:center;gap:8px;height:42px}
+.toggle input{width:18px;height:18px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+button.action{border:0;border-radius:9px;padding:10px 16px;font-weight:750;cursor:pointer}
+.primary{background:var(--blue);color:#fff}.primary:hover{background:var(--blue2)}
+.secondary{background:#eef2f6;color:#344054}.ghost{background:#fff;border:1px solid #d0d5dd;color:#344054}
+.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.kpi{padding:14px;border:1px solid var(--line);background:#fbfcfd;border-radius:12px;min-height:92px}
+.kpi .lab{font-size:12px;color:var(--muted);margin-bottom:7px}
+.kpi .val{font-size:21px;font-weight:850;line-height:1.2}
+.kpi .sub{font-size:11px;color:var(--muted);margin-top:7px;line-height:1.45}
+.total{grid-column:1/-1;background:linear-gradient(135deg,#0e5b92,#146eb4);color:#fff;border:none}
+.total .lab,.total .sub{color:rgba(255,255,255,.82)} .total .val{font-size:36px}
+.breakdown{margin-top:14px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.row{display:flex;justify-content:space-between;gap:20px;padding:10px 12px;border-bottom:1px solid var(--line);font-size:13px}
+.row:last-child{border-bottom:0}.row strong{font-variant-numeric:tabular-nums}
+.row.em{background:#f8fbff}.row.plus strong{color:var(--green)}
+.notice{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:12px;line-height:1.6}
+.notice.ok{background:#ecfdf3;border:1px solid #abefc6;color:#05603a}
+.notice.warn{background:#fff7e8;border:1px solid #f6d79a;color:#7a4b00}
+.notice.err{background:#fff1f0;border:1px solid #f4b8b2;color:#8d1a11}
+.section{margin-top:18px}
+details{border:1px solid var(--line);border-radius:12px;background:#fff;margin-top:10px}
+summary{cursor:pointer;padding:13px 15px;font-weight:750;font-size:14px}
+.details-body{padding:0 15px 15px;color:#475467;font-size:13px;line-height:1.75}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px;margin-top:10px}
+table{border-collapse:collapse;width:100%;min-width:900px}
+th,td{padding:9px 11px;border-bottom:1px solid var(--line);font-size:12px;text-align:left;white-space:nowrap}
+th{background:#f8fafc;color:#475467;position:sticky;top:0}
+tr.rate-match td{background:#fff4cf!important;border-top:2px solid #ff9900;border-bottom:2px solid #ff9900;font-weight:700}
+tr.rate-match td:first-child{border-left:2px solid #ff9900}
+tr.rate-match td:last-child{border-right:2px solid #ff9900}
+tr.rate-match td.rate-col-match{background:#ffe7a3!important;box-shadow:inset 0 0 0 2px #ff9900}
+.match-badge{display:inline-block;margin-left:8px;padding:2px 7px;border-radius:999px;background:#ff9900;color:#fff;font-size:10px;font-weight:800;vertical-align:middle}
+.pill{display:inline-block;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:750;background:#eef4ff;color:#3538cd}
+.footer{color:var(--muted);font-size:11px;line-height:1.65;margin:15px 2px 0}
+
+/* Profit calculator */
+.profit-toolbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.mini-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}
+.mini-card label{display:block;font-size:12px;font-weight:750;margin-bottom:6px}
+.scenario-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:16px}
+.scenario{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.scenario-head{padding:14px 16px;background:#eaf1fb;border-bottom:1px solid var(--line)}
+.scenario-head strong{display:block;font-size:17px}
+.scenario-head span{font-size:11px;color:var(--muted)}
+.scenario-body{padding:15px}
+.profit-inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.profit-field label{display:block;font-size:11px;font-weight:750;margin-bottom:5px;color:#475467}
+.profit-field input{height:38px;background:#fff9ce;border-color:#e7d567}
+.calc-panel{margin-top:13px;border:1px solid #b7e0c5;background:var(--greenbg);border-radius:10px;overflow:hidden}
+.calc-line{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border-bottom:1px solid #cbe8d5;font-size:12px}
+.calc-line:last-child{border-bottom:0}
+.calc-line strong{font-variant-numeric:tabular-nums}
+.calc-line.profit-final{background:#d8f1e1;font-size:14px;font-weight:850}
+.negative{color:#b42318!important}
+.positive{color:#087a48!important}
+.summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.summary-card{border:1px solid var(--line);border-radius:12px;padding:15px;background:#fff}
+.summary-card .name{font-size:12px;color:var(--muted)}
+.summary-card .big{font-size:26px;font-weight:900;margin-top:6px}
+.summary-card .small{font-size:12px;color:var(--muted);margin-top:4px}
+.legend{font-size:12px;color:#667085;margin-top:8px}
+.dot{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.dot.input{background:#fff0
+}
+.formula-box{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px}
+.formula-box h3{margin:0 0 10px;font-size:16px}
+.formula-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 20px;font-size:12px;color:#475467;line-height:1.55}
+.syncbar{margin-top:12px;padding:11px 13px;border:1px dashed #9bc8e9;border-radius:10px;background:#f4faff;font-size:12px;color:#36566c}
+@media(max-width:1050px){.scenario-grid,.summary-grid{grid-template-columns:1fr}.profit-toolbar{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{height:auto;position:static}.nav{flex-direction:row;overflow:auto}.nav button{min-width:190px}.layout{grid-template-columns:1fr}.hero{flex-direction:column}.form-grid{grid-template-columns:1fr}}
+@media(max-width:620px){.profit-toolbar,.profit-inputs,.formula-list{grid-template-columns:1fr}.page{padding:14px}}
+
+/* Advertising campaign name generator */
+.naming-layout{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}
+.naming-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.naming-output{margin-top:16px;padding:18px;border:1px solid #cfe6fb;background:#f6fbff;border-radius:12px}
+.naming-output .label{font-size:12px;color:var(--muted);margin-bottom:8px}
+.naming-output .name{font-family:Consolas,Monaco,monospace;font-size:20px;line-height:1.45;font-weight:850;color:#0f5c94;word-break:break-all}
+.naming-example{font-family:Consolas,Monaco,monospace;background:#f8fafc;border:1px solid var(--line);border-radius:9px;padding:10px 12px;color:#344054;font-size:12px;word-break:break-all}
+.naming-help-list{display:grid;gap:10px}
+.naming-help-item{padding:12px 13px;border:1px solid var(--line);border-radius:10px;background:#fbfcfd}
+.naming-help-item strong{display:block;font-size:13px;margin-bottom:4px}
+.naming-help-item span{font-size:12px;color:var(--muted);line-height:1.55}
+@media(max-width:900px){.naming-layout{grid-template-columns:1fr}}
+@media(max-width:700px){.naming-grid{grid-template-columns:1fr}}
+
+
+/* Promotion max-price calculator */
+.promo-layout{display:grid;grid-template-columns:.92fr 1.08fr;gap:18px}
+.promo-input-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.promo-input-grid .field input,.promo-input-grid .field select{background:#eef8e8;border-color:#b9d9aa}
+.promo-result-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.promo-group{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.promo-group-title{padding:11px 13px;font-size:13px;font-weight:850;background:#eef4ff;color:#344054;border-bottom:1px solid var(--line)}
+.promo-group.big .promo-group-title{background:#fff1bd;color:#694800}
+.promo-line{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 13px;border-bottom:1px solid var(--line)}
+.promo-line:last-child{border-bottom:0}
+.promo-line span{font-size:12px;color:#475467;line-height:1.4}
+.promo-line strong{font-size:18px;font-variant-numeric:tabular-nums}
+.promo-line .hot{color:#d92d20}
+.promo-validation{margin-top:12px;padding:13px 14px;border-radius:10px;border:1px solid var(--line);background:#fbfcfd}
+.promo-validation .pv-title{font-size:12px;color:var(--muted)}
+.promo-validation .pv-value{margin-top:4px;font-size:24px;font-weight:900}
+.promo-formula{margin-top:16px;font-size:12px;color:#475467;line-height:1.7}
+.promo-formula code{font-family:Consolas,monospace;background:#f8fafc;border:1px solid var(--line);border-radius:6px;padding:2px 5px}
+@media(max-width:1000px){.promo-layout{grid-template-columns:1fr}}
+@media(max-width:680px){.promo-input-grid,.promo-result-grid{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">Amazon 运营工具
+      <small>单文件 · 离线计算</small>
+    </div>
+    <div class="nav">
+      <button id="nav-fba" class="active" onclick="showPage('fba')"><span class="nav-icon">🚚</span>FBA 配送费计算器</button>
+      <button id="nav-profit" onclick="showPage('profit')"><span class="nav-icon">💰</span>利润核算器</button>
+      <button id="nav-adsname" onclick="showPage('adsname')"><span class="nav-icon">🏷️</span>广告命名生成器</button>
+      <button id="nav-promo" onclick="showPage('promo')"><span class="nav-icon">🏷</span>促销最高价试算</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- PAGE 1 -->
+    <section id="page-fba" class="page active">
+      <div class="container">
+        <div class="hero">
+          <div>
+            <h1>Amazon US FBA 2026 产品配送费计算器</h1>
+            <p>自动判断尺寸分段、体积重量、发货重量、非旺季/旺季费用、3.5% 燃油物流附加费及特大号处理费。</p>
+          </div>
+          <div class="version">2026 Fee Logic</div>
+        </div>
+
+        <div class="layout">
+          <div class="card">
+            <h2>商品数据</h2>
+            <div class="form-grid">
+              <div class="field">
+                <label>商品售价（USD）</label>
+                <input id="price" class="editable" type="number" min="0" step="0.01" placeholder="例如 29.99">
+                <div class="help">自动匹配：&lt;$10 / $10–$50 / &gt;$50</div>
+              </div>
+              <div class="field">
+                <label>计费日期</label>
+                <input id="feeDate" class="editable" type="date">
+                <div class="help">自动判断非旺季/旺季，并判断 3.5% 附加费。</div>
+              </div>
+              <div class="field">
+                <label>包装后实际重量</label>
+                <div class="input-row">
+                  <input id="actualWeight" class="editable" type="number" min="0" step="0.01" placeholder="例如 12.5">
+                  <select id="actualWeightUnit" class="editable"><option value="lb">lb</option><option value="oz">oz</option><option value="kg">kg</option></select>
+                </div>
+              </div>
+              <div class="field">
+                <label>发货重量</label>
+                <input type="text" value="自动计算" readonly style="background:#f8fafc;font-weight:700">
+                <div class="help">按尺寸分段自动选择商品重量或体积重量。</div>
+              </div>
+              <div class="field">
+                <label>尺寸 1</label>
+                <div class="input-row">
+                  <input id="d1" class="editable" type="number" min="0" step="0.01" placeholder="例如 18">
+                  <select id="dimUnit" class="editable"><option value="in">in</option><option value="cm">cm</option></select>
+                </div>
+              </div>
+              <div class="field"><label>尺寸 2</label><input id="d2" class="editable" type="number" min="0" step="0.01" placeholder="例如 14"></div>
+              <div class="field"><label>尺寸 3</label><input id="d3" class="editable" type="number" min="0" step="0.01" placeholder="例如 8"></div>
+              <div class="field">
+                <label>燃油和物流相关附加费</label>
+                <div class="toggle"><input id="fuelToggle" type="checkbox"><span>加收 3.5%</span></div>
+                <div class="help">2026-04-17 起自动勾选，可手动覆盖。</div>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="action primary" onclick="calculateFBA()">计算配送费</button>
+              <button class="action secondary" onclick="fillFBAExample()">填入示例</button>
+              <button class="action ghost" onclick="resetFBA()">重置</button>
+            </div>
+            <div id="fbaMessage"></div>
+          </div>
+
+          <div class="card">
+            <h2>计算结果</h2>
+            <div class="results">
+              <div class="kpi"><div class="lab">商品尺寸分段</div><div class="val" id="tier">—</div><div class="sub" id="tierSub">等待计算</div></div>
+              <div class="kpi"><div class="lab">价格档</div><div class="val" id="priceBand">—</div><div class="sub" id="season">—</div></div>
+              <div class="kpi"><div class="lab">标准化尺寸</div><div class="val" style="font-size:17px" id="sortedDims">—</div><div class="sub">最长边 ≥ 次长边 ≥ 最短边</div></div>
+              <div class="kpi"><div class="lab">长度 + 围长</div><div class="val" id="lg">—</div><div class="sub" id="girth">围长 = 2 ×（次长边 + 最短边）</div></div>
+              <div class="kpi"><div class="lab">体积重量</div><div class="val" id="dimensionalWeight">—</div><div class="sub" id="dimensionalFormula">长 × 宽 × 高 ÷ 139</div></div>
+              <div class="kpi"><div class="lab">发货重量</div><div class="val" id="shippingWeight">—</div><div class="sub" id="weightSource">—</div></div>
+              <div class="kpi"><div class="lab">特大号状态</div><div class="val" id="oversizeFlag">—</div><div class="sub">最长边 &gt;96 in 或 长度+围长 &gt;130 in，且 ≤150 lb</div></div>
+              <div class="kpi total"><div class="lab">预计单件 FBA 配送相关费用</div><div class="val" id="grandTotal">$—</div><div class="sub" id="formula">配送费 + 3.5%附加费（如适用）+ 特大号处理费（如适用）</div></div>
+            </div>
+            <div class="breakdown">
+              <div class="row em"><span>FBA 配送费</span><strong id="fulfillmentFee">$—</strong></div>
+              <div class="row plus"><span>燃油和物流相关附加费</span><strong id="fuelFee">$—</strong></div>
+              <div class="row plus"><span>特大号处理费</span><strong id="extraHandling">$—</strong></div>
+              <div class="row"><span>最终合计</span><strong id="totalLine">$—</strong></div>
+            </div>
+            <div class="syncbar">计算完成后，可切换到「利润核算器」，点击“引用配送费结果”，把当前最终配送相关费用直接带入三种物流方案。</div>
+          </div>
+        </div>
+
+        <div class="card section">
+          <h2>计算规则说明</h2>
+          <details>
+            <summary>尺寸分段判定</summary>
+            <div class="details-body">
+              <b>小号标准：</b>重量 ≤16 oz，最长边 ≤15 in，次长边 ≤12 in，最短边 ≤0.75 in。<br>
+              <b>大号标准：</b>重量 ≤20 lb，最长边 ≤18 in，次长边 ≤14 in，最短边 ≤8 in。<br>
+              <b>小号大件：</b>重量 ≤50 lb，最长边 ≤37 in，次长边 ≤28 in，最短边 ≤20 in，且长度+围长 ≤130 in。<br>
+              <b>大号大件：</b>重量 ≤50 lb，最长边 ≤59 in，次长边 ≤33 in，最短边 ≤33 in，且长度+围长 ≤130 in。<br>
+              <b>超大件：</b>不满足上述分段后，按商品重量进入 0–50 / &gt;50–70 / &gt;70–150 / &gt;150 lb。
+            </div>
+          </details>
+          <details open>
+            <summary>发货重量与体积重量规则</summary>
+            <div class="details-body">
+              体积重量 = 长 × 宽 × 高 ÷ 139。计算大号大件和超大件时，次长边、最短边最低按 2 in。<br>
+              小号标准：商品重量；大号标准：商品重量与体积重量取较大值；大号大件：取较大值；超大件 ≤150 lb：取较大值；超大件 &gt;150 lb：商品重量。<br>
+              小号大件在你提供的发货重量对照表中未单列，本工具当前按商品重量计算并明确提示。
+            </div>
+          </details>
+        </div>
+
+        <div class="card section">
+          <h2>2026 费率速查 <span class="pill">计算后自动定位并高亮</span></h2>
+          <details id="offDetails"><summary>2026 非旺季：2026-01-15 至 2026-10-14</summary><div class="details-body"><div id="offpeakTable"></div></div></details>
+          <details id="peakDetails"><summary>2026 旺季：2026-10-15 至 2027-01-14</summary><div class="details-body"><div id="peakTable"></div></div></details>
+        </div>
+        <div class="footer">FBA 费用数据依据你提供的 2026 费率资料制作。正式结算仍以 Seller Central 实际账单为准。</div>
+      </div>
+    </section>
+
+    <!-- PAGE 2 -->
+    <section id="page-profit" class="page">
+      <div class="container">
+        <div class="hero">
+          <div>
+            <h1>利润核算器</h1>
+            <p>根据你上传的「利润核算器_带公式.xlsx」还原。黄色输入项可修改，绿色区域自动计算；同时比较空运、海派、海运三种方案。</p>
+          </div>
+          <div class="version">Excel Formula Logic</div>
+        </div>
+
+        <div class="card">
+          <h2>基础参数</h2>
+          <div class="profit-toolbar">
+            <div class="mini-card"><label>年平均汇率 RMB/USD</label><input id="fx" class="editable" type="number" step="0.01" value="6.7" oninput="calcProfit()"></div>
+            <div class="mini-card"><label>SKU</label><input id="sku" class="editable" type="text" value="5"></div>
+            <div class="mini-card"><label>产品描述</label><input id="productDesc" class="editable" type="text" value="5"></div>
+            <div class="mini-card"><label>管理费用（USD/件）</label><input id="mgmtFee" class="editable" type="number" step="0.01" value="1.49" oninput="calcProfit()"></div>
+            <div class="mini-card"><label>AMZ 佣金率</label><input id="commissionRate" class="editable" type="number" step="0.001" value="0.15" oninput="calcProfit()"><div class="help">0.15 = 15%</div></div>
+            <div class="mini-card"><label>消费税率</label><input id="salesTaxRate" class="editable" type="number" step="0.001" value="0" oninput="calcProfit()"><div class="help">0 = 0%</div></div>
+            <div class="mini-card"><label>进口税率</label><input id="importTaxRate" class="editable" type="number" step="0.001" value="0.05" oninput="calcProfit()"><div class="help">0.05 = 5%</div></div>
+            <div class="mini-card"><label>AMZ 广告费率</label><input id="adRate" class="editable" type="number" step="0.001" value="0.15" oninput="calcProfit()"><div class="help">Excel 默认 15%</div></div>
+            <div class="mini-card"><label>退货率</label><input id="returnRate" class="editable" type="number" step="0.001" value="0.03" oninput="calcProfit()"><div class="help">0.03 = 3%</div></div>
+            <div class="mini-card"><label>提现费率</label><input id="withdrawRate" class="editable" type="number" step="0.001" value="0.005" oninput="calcProfit()"><div class="help">0.005 = 0.5%</div></div>
+          </div>
+          <div class="actions">
+            <button class="action primary" onclick="syncFBAFee()">引用配送费结果</button>
+            <button class="action secondary" onclick="resetProfit()">恢复 Excel 示例值</button>
+          </div>
+          <div id="profitMessage"></div>
+        </div>
+
+        <div class="scenario-grid">
+          <div class="scenario">
+            <div class="scenario-head"><strong>空运</strong><span>Excel 标注：¥50/kg</span></div>
+            <div class="scenario-body">
+              <div class="profit-inputs">
+                <div class="profit-field"><label>FBA Price</label><input id="p_air" type="number" step="0.01" value="26.99" oninput="calcProfit()"></div>
+                <div class="profit-field"><label>AMZ 物流</label><input id="fba_air" type="number" step="0.01" value="5.76" oninput="calcProfit()"></div>
+                <div class="profit-field"><label>头程运费</label><input id="freight_air" type="number" step="0.01" value="3.99" oninput="calcProfit()"></div>
+                <div class="profit-field"><label>采购价 RMB</label><input id="purchase_air" type="number" step="0.01" value="34.90" oninput="calcProfit()"></div>
+              </div>
+              <div class="calc-panel" id="panel_air"></div>
+            </div>
+          </div>
+
+          <div class="scenario">
+            <div class="scenario-head"><strong>海派</strong><span>Excel 标注：¥20/kg</span></div>
+            <div class="scenario-body">
+              <div class="profit-inputs">
+                <div class="profit-field"><label>FBA Price</label><input id="p_seaair" type="number" step="0.01" value="26.99" oninput="calcProfit()"></div>
+                <div class="profit-field"><label>AMZ 物流</label><input id="fba_seaair" type="number" step="0.01" value="5.76" oninput="calcProfit()"></div>
+                <div class="profit-field"><label>头程运费</label><input id="freight_seaair" type="number" step="0.01" value="1.59" oninput="calcProfit()"></div>
+                <div class="profit-field"><label>采购价 RMB</label><input id="purchase_seaair" type="number" step="0.01" value="34.90" oninput="calcProfit()"></div>
+              </div>
+              <div class="calc-panel" id="panel_seaair"></div>
+            </div>
+          </div>
+
+          <div class="scenario">
+            <div class="scenario-head"><strong>海运</strong><span>Excel 标注：¥1.5k/m³</span></div>
+            <div class="scenario-body">
+              <div class="profit-inputs">
+                <div class="profit-field"><label>FBA Price</label><input id="p_sea" type="number" step="0.01" value="24.99" oninput="calcProfit()"></div>
+                <div class="profit-field"><label>AMZ 物流</label><input id="fba_sea" type="number" step="0.01" value="5.76" oninput="calcProfit()"></div>
+                <div class="profit-field"><label>头程运费</label><input id="freight_sea" type="number" step="0.01" value="0.84" oninput="calcProfit()"></div>
+                <div class="profit-field"><label>采购价 RMB</label><input id="purchase_sea" type="number" step="0.01" value="34.90" oninput="calcProfit()"></div>
+              </div>
+              <div class="calc-panel" id="panel_sea"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card section">
+          <h2>利润结果对比</h2>
+          <div class="summary-grid" id="profitSummary"></div>
+        </div>
+
+        <div class="formula-box">
+          <h3>Excel 公式逻辑</h3>
+          <div class="formula-list">
+            <div><b>采购价 USD</b> = 采购价 RMB ÷ 年平均汇率</div>
+            <div><b>AMZ 佣金</b> = FBA Price × 佣金率</div>
+            <div><b>消费税</b> = FBA Price × 消费税率</div>
+            <div><b>进口税</b> = FBA Price × 进口税率</div>
+            <div><b>广告费</b> = FBA Price × 广告费率</div>
+            <div><b>退货成本</b> = FBA Price × 退货率</div>
+            <div><b>毛利</b> = 售价 − 佣金 − 消费税 − AMZ物流 − 头程 − 采购USD − 进口税 − 广告 − 退货</div>
+            <div><b>提现费</b> = MAX(0, (售价−佣金−消费税−AMZ物流−广告−退货) × 提现费率)</div>
+            <div><b>利润</b> = 毛利 − 提现费 − 管理费用</div>
+            <div><b>利润率</b> = 利润 ÷ FBA Price</div>
+          </div>
+        </div>
+        <div class="footer">利润核算公式与上传 Excel 中 C:E 列公式一致；输入默认值也按该文件还原。</div>
+      </div>
+    </section>
+
+    <!-- PAGE 3 -->
+    <section id="page-adsname" class="page">
+      <div class="container">
+        <div class="hero">
+          <div>
+            <h1>Amazon 广告活动命名生成器</h1>
+            <p>只需输入 SKU、选择广告类型和广告目的，自动生成统一 Campaign Name。固定站点 US，日期自动读取当天。</p>
+          </div>
+          <div class="version">Campaign Naming Standard</div>
+        </div>
+
+        <div class="naming-layout">
+          <div class="card">
+            <h2>命名参数</h2>
+
+            <div class="naming-grid">
+              <div class="field">
+                <label>产品 SKU</label>
+                <input id="adsSku" class="editable" type="text" placeholder="例如 PD-HBD-MRY-01">
+                <div class="help">建议与 Seller Central SKU 完全一致。</div>
+              </div>
+
+              <div class="field">
+                <label>广告类型</label>
+                <select id="adsType" class="editable" onchange="generateAdName()">
+                  <optgroup label="Sponsored Products - 自动广告">
+                    <option value="SP|AUTO|Close">SP · AUTO · Close</option>
+                    <option value="SP|AUTO|Loose">SP · AUTO · Loose</option>
+                    <option value="SP|AUTO|Substitutes">SP · AUTO · Substitutes</option>
+                    <option value="SP|AUTO|Complements">SP · AUTO · Complements</option>
+                  </optgroup>
+                  <optgroup label="Sponsored Products - 手动关键词">
+                    <option value="SP|MANUAL|Exact">SP · MANUAL · Exact</option>
+                    <option value="SP|MANUAL|Phrase">SP · MANUAL · Phrase</option>
+                    <option value="SP|MANUAL|Broad">SP · MANUAL · Broad</option>
+                  </optgroup>
+                  <optgroup label="Sponsored Products - 商品投放">
+                    <option value="SP|PAT|ASIN">SP · PAT · ASIN</option>
+                    <option value="SP|PAT|Category">SP · PAT · Category</option>
+                  </optgroup>
+                  <optgroup label="Sponsored Brands">
+                    <option value="SB|MANUAL|Exact">SB · MANUAL · Exact</option>
+                    <option value="SB|MANUAL|Phrase">SB · MANUAL · Phrase</option>
+                    <option value="SB|MANUAL|Broad">SB · MANUAL · Broad</option>
+                    <option value="SB|PAT|ASIN">SB · PAT · ASIN</option>
+                  </optgroup>
+                  <optgroup label="Sponsored Brands Video">
+                    <option value="SBV|MANUAL|Exact">SBV · MANUAL · Exact</option>
+                    <option value="SBV|MANUAL|Phrase">SBV · MANUAL · Phrase</option>
+                    <option value="SBV|MANUAL|Broad">SBV · MANUAL · Broad</option>
+                  </optgroup>
+                  <optgroup label="Sponsored Display">
+                    <option value="SD|PAT|ASIN">SD · PAT · ASIN</option>
+                    <option value="SD|AUD|Remarketing">SD · AUD · Remarketing</option>
+                  </optgroup>
+                </select>
+                <div class="help">Targeting 与 Match/Type 自动写入名称。</div>
+              </div>
+
+              <div class="field">
+                <label>广告目的</label>
+                <select id="adsObjective" class="editable" onchange="generateAdName()">
+                  <option value="Launch">Launch · 新品启动</option>
+                  <option value="Rank">Rank · 推关键词排名</option>
+                  <option value="Sales">Sales · 获取订单</option>
+                  <option value="Explore">Explore · 挖词测试</option>
+                  <option value="Traffic">Traffic · 扩流量</option>
+                  <option value="Attack">Attack · 竞品截流</option>
+                  <option value="Defense">Defense · 品牌防守</option>
+                  <option value="Profit">Profit · 利润型</option>
+                  <option value="Remarket">Remarket · 再营销</option>
+                  <option value="Brand">Brand · 品牌曝光</option>
+                  <option value="Clear">Clear · 清库存</option>
+                </select>
+                <div class="help">按 Campaign 的真实运营目的选择。</div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="action primary" onclick="generateAdName()">生成名称</button>
+              <button class="action secondary" onclick="copyAdName()">一键复制</button>
+              <button class="action ghost" onclick="resetAdName()">重置</button>
+            </div>
+
+            <div class="naming-output">
+              <div class="label">生成结果</div>
+              <div class="name" id="adsCampaignName">US_SP_PD-HBD-MRY-01_AUTO_Close_Launch_YYYYMMDD</div>
+            </div>
+            <div id="adsNameMessage"></div>
+          </div>
+
+          <div class="card">
+            <h2>命名规则</h2>
+            <div class="naming-example">US_[AdType]_[SKU]_[Targeting]_[Match/Type]_[Objective]_[YYYYMMDD]</div>
+
+            <div class="section naming-help-list">
+              <div class="naming-help-item">
+                <strong>站点</strong>
+                <span>固定为 US，代表 Amazon 美国站。</span>
+              </div>
+              <div class="naming-help-item">
+                <strong>广告类型</strong>
+                <span>SP / SB / SBV / SD。</span>
+              </div>
+              <div class="naming-help-item">
+                <strong>投放方式</strong>
+                <span>AUTO / MANUAL / PAT / AUD。</span>
+              </div>
+              <div class="naming-help-item">
+                <strong>投放细分</strong>
+                <span>Close / Loose / Exact / Phrase / Broad / ASIN / Category / Remarketing 等。</span>
+              </div>
+              <div class="naming-help-item">
+                <strong>广告目的</strong>
+                <span>Launch / Rank / Sales / Explore / Traffic / Attack / Defense / Profit / Remarket / Brand / Clear。</span>
+              </div>
+            </div>
+
+            <div class="section">
+              <h2 style="font-size:15px">示例</h2>
+              <div class="naming-example">US_SP_PD-HBD-MRY-01_AUTO_Close_Launch_20260929</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">建议所有 Campaign 统一使用同一字段顺序，方便后续导出广告报表后按“_”拆分并进行透视分析。</div>
+      </div>
+    </section>
+
+
+    <!-- PAGE 4 -->
+    <section id="page-promo" class="page">
+      <div class="container">
+        <div class="hero">
+          <div>
+            <h1>秒杀 / 价格折扣 / 优惠券 最高促销价格试算</h1>
+            <p>依据你上传的 Excel「Sheet1」公式制作。绿色区域为输入项，自动计算日常与大促场景下各促销工具的最高可做价格。</p>
+          </div>
+          <div class="version">Excel Sheet1 Logic</div>
+        </div>
+
+        <div class="promo-layout">
+          <div class="card">
+            <h2>基础价格数据 <span class="pill" style="background:#eaf8df;color:#3a672d">绿色部分需填写</span></h2>
+            <div class="promo-input-grid">
+              <div class="field">
+                <label>站点</label>
+                <select id="promoSite" class="editable" onchange="calcPromo()">
+                  <option value="US">US</option>
+                  <option value="CA">CA</option>
+                </select>
+                <div class="help">US / CA 的部分日常促销公式不同。</div>
+              </div>
+              <div class="field">
+                <label>原价（Your Price）</label>
+                <input id="promoYourPrice" class="editable" type="number" min="0" step="0.01" value="69.99" oninput="calcPromo()">
+              </div>
+              <div class="field">
+                <label>参考价（List Price）</label>
+                <input id="promoListPrice" class="editable" type="number" min="0" step="0.01" value="69.99" oninput="calcPromo()">
+              </div>
+              <div class="field">
+                <label>历史售价（Was Price）</label>
+                <input id="promoWasPrice" class="editable" type="number" min="0" step="0.01" value="59.99" oninput="calcPromo()">
+              </div>
+              <div class="field">
+                <label>30天最低价（含促销价）</label>
+                <input id="promo30All" class="editable" type="number" min="0" step="0.01" value="59.98" oninput="calcPromo()">
+              </div>
+              <div class="field">
+                <label>30天最低价（非促销，非价格折扣）</label>
+                <input id="promo30Regular" class="editable" type="number" min="0" step="0.01" value="69.99" oninput="calcPromo()">
+              </div>
+              <div class="field">
+                <label>60天最低价（含促销价）</label>
+                <input id="promo60All" class="editable" type="number" min="0" step="0.01" value="59.98" oninput="calcPromo()">
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="action primary" onclick="calcPromo()">计算最高促销价</button>
+              <button class="action secondary" onclick="fillPromoExample('US')">填入 US 示例</button>
+              <button class="action secondary" onclick="fillPromoExample('CA')">填入 CA 示例</button>
+              <button class="action ghost" onclick="resetPromo()">重置</button>
+            </div>
+            <div id="promoMessage"></div>
+
+            <div class="promo-formula">
+              <b>说明：</b>计算逻辑严格按上传 Excel 的 Sheet1 公式还原；结果默认显示 2 位小数。<br>
+              “优惠券验证” = <code>(当前 Your Price − 历史 Was Price) ÷ 历史 Was Price</code>，用于观察当前价格相对历史售价的涨幅。
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>最高可做价格</h2>
+
+            <div class="promo-result-grid">
+              <div class="promo-group">
+                <div class="promo-group-title">日常促销</div>
+                <div class="promo-line"><span>Z划算（日常）</span><strong class="hot" id="promoDailyZ">$—</strong></div>
+                <div class="promo-line"><span>秒杀（日常）</span><strong id="promoDailyDeal">$—</strong></div>
+                <div class="promo-line"><span>价格折扣（日常）</span><strong id="promoDailyDiscount">$—</strong></div>
+                <div class="promo-line"><span>优惠券（日常）</span><strong id="promoDailyCoupon">$—</strong></div>
+              </div>
+
+              <div class="promo-group big">
+                <div class="promo-group-title">大促</div>
+                <div class="promo-line"><span>Z划算（大促）</span><strong class="hot" id="promoEventZ">$—</strong></div>
+                <div class="promo-line"><span>秒杀（大促）</span><strong id="promoEventDeal">$—</strong></div>
+                <div class="promo-line"><span>价格折扣（大促）</span><strong id="promoEventDiscount">$—</strong></div>
+              </div>
+            </div>
+
+            <div class="promo-validation">
+              <div class="pv-title">优惠券验证｜当前价格相对历史售价涨幅</div>
+              <div class="pv-value" id="promoCouponValidation">—</div>
+              <div class="help" id="promoCouponValidationHelp">Excel 规则提示：当前价格至多比历史售价高 30%。</div>
+            </div>
+
+            <div class="breakdown" style="margin-top:14px">
+              <div class="row em"><span>当前站点</span><strong id="promoSiteResult">US</strong></div>
+              <div class="row"><span>日常价格折扣公式差异</span><strong id="promoDiscountRule">US Rule</strong></div>
+              <div class="row"><span>日常优惠券公式差异</span><strong id="promoCouponRule">US Rule</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card section">
+          <h2>Sheet1 公式规则</h2>
+          <div class="details-body" style="padding:0">
+            <div class="table-wrap">
+              <table style="min-width:980px">
+                <thead>
+                  <tr><th>促销类型</th><th>US 公式</th><th>CA 公式</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Z划算（日常）</td><td>MIN(List×90%, Was−0.01, 30天最低价含促销)</td><td>同 US</td></tr>
+                  <tr><td>秒杀（日常）</td><td>MIN(List×85%, Was−0.01, 30天最低价含促销)</td><td>同 US</td></tr>
+                  <tr><td>价格折扣（日常）</td><td>MIN(List×95%, Your×95%, 30天非促销最低价×95%)</td><td>MIN(List×95%, Your×95%, 30天非促销最低价×95%, Was−0.01)</td></tr>
+                  <tr><td>优惠券（日常）</td><td>MIN(List×95%, Was×95%)</td><td>MIN(List×95%, Was−0.01)</td></tr>
+                  <tr><td>Z划算（大促）</td><td>MIN(List×85%, Was×95%, 30天含促销×95%, 60天含促销)</td><td>同 US</td></tr>
+                  <tr><td>秒杀（大促）</td><td>MIN(List×80%, Was×95%, 30天含促销×95%, 60天含促销)</td><td>同 US</td></tr>
+                  <tr><td>价格折扣（大促）</td><td>MIN(List×85%, Was×95%, 30天含促销×95%, 60天含促销, Your×80%)</td><td>同 US</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">本模块仅复现你上传 Excel Sheet1 中的试算逻辑；实际促销资格与最终可提交价格仍以 Amazon Seller Central 当时校验结果为准。</div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+let lastFbaTotal = null;
+
+/* ---------- navigation ---------- */
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---------- FBA data ---------- */
+const priceBandName={lt10:'< $10','10to50':'$10–$50',gt50:'> $50'};
+const standardBands={
+  small:[
+    {maxOz:2,label:'≤ 2 oz',off:[2.43,3.32,3.58],peak:[2.62,3.51,3.77]},
+    {maxOz:4,label:'>2–4 oz',off:[2.49,3.42,3.68],peak:[2.68,3.61,3.87]},
+    {maxOz:6,label:'>4–6 oz',off:[2.56,3.45,3.71],peak:[2.76,3.65,3.91]},
+    {maxOz:8,label:'>6–8 oz',off:[2.66,3.54,3.80],peak:[2.86,3.74,4.00]},
+    {maxOz:10,label:'>8–10 oz',off:[2.77,3.68,3.94],peak:[2.98,3.89,4.15]},
+    {maxOz:12,label:'>10–12 oz',off:[2.82,3.78,4.04],peak:[3.03,3.99,4.25]},
+    {maxOz:14,label:'>12–14 oz',off:[2.92,3.91,4.17],peak:[3.14,4.13,4.39]},
+    {maxOz:16,label:'>14–16 oz',off:[2.95,3.96,4.22],peak:[3.17,4.18,4.44]}
+  ],
+  large:[
+    {maxLb:.25,label:'≤ 4 oz',off:[2.91,3.73,3.99],peak:[3.15,3.97,4.23]},
+    {maxLb:.5,label:'>4–8 oz',off:[3.13,3.95,4.21],peak:[3.39,4.21,4.47]},
+    {maxLb:.75,label:'>8–12 oz',off:[3.38,4.20,4.46],peak:[3.66,4.48,4.74]},
+    {maxLb:1,label:'>12–16 oz',off:[3.78,4.60,4.86],peak:[4.07,4.89,5.15]},
+    {maxLb:1.25,label:'>1–1.25 lb',off:[4.22,5.04,5.30],peak:[4.52,5.34,5.60]},
+    {maxLb:1.5,label:'>1.25–1.5 lb',off:[4.60,5.42,5.68],peak:[4.91,5.73,5.99]},
+    {maxLb:1.75,label:'>1.5–1.75 lb',off:[4.75,5.57,5.83],peak:[5.07,5.89,6.15]},
+    {maxLb:2,label:'>1.75–2 lb',off:[5.00,5.82,6.08],peak:[5.33,6.15,6.41]},
+    {maxLb:2.25,label:'>2–2.25 lb',off:[5.10,5.92,6.18],peak:[5.47,6.29,6.55]},
+    {maxLb:2.5,label:'>2.25–2.5 lb',off:[5.28,6.10,6.36],peak:[5.67,6.49,6.75]},
+    {maxLb:2.75,label:'>2.5–2.75 lb',off:[5.44,6.26,6.52],peak:[5.84,6.66,6.92]},
+    {maxLb:3,label:'>2.75–3 lb',off:[5.85,6.67,6.93],peak:[6.26,7.08,7.34]}
+  ]
+};
+const variableRates={
+  off:{smallBulky:[6.78,7.55,7.55],largeBulky:[8.58,9.35,9.35],xl0:[25.56,26.33,26.33],xl50:[36.55,37.32,37.32],xl70:[50.55,51.32,51.32],xl150:[194.18,194.95,194.95],largeOver3:[6.15,6.97,7.23]},
+  peak:{smallBulky:[7.82,8.59,8.59],largeBulky:[9.62,10.39,10.39],xl0:[28.29,29.06,29.06],xl50:[39.36,40.13,40.13],xl70:[54.97,55.74,55.74],xl150:[202.69,203.46,203.46],largeOver3:[6.69,7.51,7.77]}
+};
+function money(n){return '$'+Number(n).toFixed(2)}
+function pct(n){return (Number(n)*100).toFixed(2)+'%'}
+function num(id){return Number(document.getElementById(id).value)||0}
+function toIn(v,u){return u==='cm'?v/2.54:v}
+function toLb(v,u){if(u==='oz')return v/16;if(u==='kg')return v*2.2046226218;return v}
+function bandIndex(p){return p<10?0:(p<=50?1:2)}
+function bandKey(p){return p<10?'lt10':(p<=50?'10to50':'gt50')}
+function getSeason(dateStr){
+  const d=new Date(dateStr+'T00:00:00'),p0=new Date('2026-10-15T00:00:00'),p1=new Date('2027-01-14T23:59:59'),o0=new Date('2026-01-15T00:00:00'),o1=new Date('2026-10-14T23:59:59');
+  if(d>=p0&&d<=p1)return{key:'peak',name:'2026 旺季'};
+  if(d>=o0&&d<=o1)return{key:'off',name:'2026 非旺季'};
+  return null;
+}
+function classify(actualLb,L,W,H){
+  const lg=L+2*(W+H);
+  if(actualLb<=1&&L<=15&&W<=12&&H<=.75)return{id:'small',name:'小号标准尺寸'};
+  if(actualLb<=20&&L<=18&&W<=14&&H<=8)return{id:'large',name:'大号标准尺寸'};
+  if(actualLb<=50&&L<=37&&W<=28&&H<=20&&lg<=130)return{id:'smallBulky',name:'小号大件'};
+  if(actualLb<=50&&L<=59&&W<=33&&H<=33&&lg<=130)return{id:'largeBulky',name:'大号大件'};
+  if(actualLb<=50)return{id:'xl0',name:'超大件：0–50 lb'};
+  if(actualLb<=70)return{id:'xl50',name:'超大件：>50–70 lb'};
+  if(actualLb<=150)return{id:'xl70',name:'超大件：>70–150 lb'};
+  return{id:'xl150',name:'超大件：>150 lb'};
+}
+function dimensionalWeightForTier(tier,L,W,H){
+  if(['largeBulky','xl0','xl50','xl70','xl150'].includes(tier.id)){
+    const aw=Math.max(W,2),ah=Math.max(H,2);
+    return{weight:(L*aw*ah)/139,formula:`${L.toFixed(2)} × ${aw.toFixed(2)} × ${ah.toFixed(2)} ÷ 139`};
+  }
+  return{weight:(L*W*H)/139,formula:`${L.toFixed(2)} × ${W.toFixed(2)} × ${H.toFixed(2)} ÷ 139`};
+}
+function shippingWeightForTier(tier,actualLb,dimLb){
+  if(tier.id==='small')return{weight:actualLb,source:'小号标准尺寸：采用商品重量'};
+  if(tier.id==='large')return{weight:Math.max(actualLb,dimLb),source:'大号标准尺寸：商品重量与体积重量取较大值'};
+  if(tier.id==='smallBulky')return{weight:actualLb,source:'小号大件：当前按商品重量计算'};
+  if(tier.id==='largeBulky')return{weight:Math.max(actualLb,dimLb),source:'大号大件：商品重量与体积重量取较大值'};
+  if(['xl0','xl50','xl70'].includes(tier.id))return{weight:Math.max(actualLb,dimLb),source:'超大件 ≤150 lb：商品重量与体积重量取较大值'};
+  return{weight:actualLb,source:'超大件 >150 lb：采用商品重量'};
+}
+function calcFulfillment(tier,shipLb,seasonKey,idx){
+  if(tier.id==='small'){
+    const oz=shipLb*16,row=standardBands.small.find(r=>oz<=r.maxOz+1e-9);
+    if(!row)return{error:'小号标准尺寸的发货重量超出 16 oz。'};
+    return{fee:row[seasonKey][idx],detail:`${row.label} 固定费率`,refKey:`small_${standardBands.small.indexOf(row)}`};
+  }
+  if(tier.id==='large'){
+    if(shipLb<=3+1e-9){
+      const row=standardBands.large.find(r=>shipLb<=r.maxLb+1e-9);
+      if(!row)return{error:'未匹配到大号标准尺寸重量档。'};
+      return{fee:row[seasonKey][idx],detail:`${row.label} 固定费率`,refKey:`large_${standardBands.large.indexOf(row)}`};
+    }
+    if(shipLb<=20+1e-9){
+      const base=variableRates[seasonKey].largeOver3[idx],steps=Math.ceil(Math.max(0,(shipLb-3)*16)/4-1e-9);
+      return{fee:base+steps*.08,detail:`${money(base)} + ${steps} × $0.08（超出 3 lb 后每 4 oz）`,refKey:'large_over3'};
+    }
+    return{error:'大号标准尺寸的发货重量超出 20 lb。'};
+  }
+  const base=variableRates[seasonKey][tier.id][idx];
+  if(['smallBulky','largeBulky','xl0'].includes(tier.id)){
+    const extra=Math.max(0,Math.ceil(shipLb-1-1e-9));
+    return{fee:base+extra*.38,detail:`${money(base)} + ${extra} × $0.38（超出首磅）`,refKey:tier.id};
+  }
+  if(tier.id==='xl50'){const extra=Math.max(0,Math.ceil(shipLb-51-1e-9));return{fee:base+extra*.75,detail:`${money(base)} + ${extra} × $0.75（超出 51 lb）`,refKey:'xl50'};}
+  if(tier.id==='xl70'){const extra=Math.max(0,Math.ceil(shipLb-71-1e-9));return{fee:base+extra*.75,detail:`${money(base)} + ${extra} × $0.75（超出 71 lb）`,refKey:'xl70'};}
+  const extra=Math.max(0,Math.ceil(shipLb-151-1e-9));return{fee:base+extra*.19,detail:`${money(base)} + ${extra} × $0.19（超出 151 lb）`,refKey:'xl150'};
+}
+function specialHandling(actualLb,L,lengthGirth){
+  const q=actualLb<=150&&(L>96||lengthGirth>130);
+  if(!q)return{qualifies:false,fee:0};
+  if(actualLb<=50)return{qualifies:true,fee:17};
+  if(actualLb<=70)return{qualifies:true,fee:21};
+  return{qualifies:true,fee:25};
+}
+function calculateFBA(){
+  const p=num('price'),date=document.getElementById('feeDate').value,aw=num('actualWeight'),raw=[num('d1'),num('d2'),num('d3')];
+  if(!(p>=0)||!date||!(aw>0)||raw.some(x=>!(x>0))){fbaMsg('请完整填写商品售价、计费日期、包装后实际重量和 3 个尺寸。','err');return}
+  const seasonInfo=getSeason(date);if(!seasonInfo){fbaMsg('日期超出支持区间：2026-01-15 至 2027-01-14。','err');return}
+  const actualLb=toLb(aw,actualWeightUnit.value),dims=raw.map(x=>toIn(x,dimUnit.value)).sort((a,b)=>b-a),[L,W,H]=dims;
+  const girthVal=2*(W+H),lengthGirth=L+girthVal,tierInfo=classify(actualLb,L,W,H),dimInfo=dimensionalWeightForTier(tierInfo,L,W,H),shipInfo=shippingWeightForTier(tierInfo,actualLb,dimInfo.weight);
+  const idx=bandIndex(p),feeObj=calcFulfillment(tierInfo,shipInfo.weight,seasonInfo.key,idx);if(feeObj.error){fbaMsg(feeObj.error,'err');return}
+  const fuel=fuelToggle.checked?feeObj.fee*.035:0,handling=specialHandling(actualLb,L,lengthGirth),total=feeObj.fee+fuel+handling.fee;
+  tier.textContent=tierInfo.name;tierSub.textContent=`商品重量 ${actualLb.toFixed(2)} lb`;priceBand.textContent=priceBandName[bandKey(p)];season.textContent=seasonInfo.name;
+  sortedDims.textContent=`${L.toFixed(2)} × ${W.toFixed(2)} × ${H.toFixed(2)} in`;lg.textContent=`${lengthGirth.toFixed(2)} in`;girth.textContent=`围长 ${girthVal.toFixed(2)} in`;
+  dimensionalWeight.textContent=`${dimInfo.weight.toFixed(2)} lb`;dimensionalFormula.textContent=dimInfo.formula;shippingWeight.textContent=`${shipInfo.weight.toFixed(2)} lb`;weightSource.textContent=shipInfo.source;
+  oversizeFlag.textContent=handling.qualifies?'是':'否';fulfillmentFee.textContent=money(feeObj.fee);fuelFee.textContent=money(fuel);extraHandling.textContent=money(handling.fee);grandTotal.textContent=money(total);totalLine.textContent=money(total);
+  formula.textContent=`${feeObj.detail}${fuelToggle.checked?'；+3.5% 附加费':''}${handling.qualifies?`；+特大号处理费 ${money(handling.fee)}`:''}`;
+  lastFbaTotal=total;highlightRateReference(seasonInfo.key,feeObj.refKey,idx);fbaMsg('计算完成，参考费率已定位并高亮。','ok');
+}
+function updateFuelByDate(){const v=feeDate.value;if(!v)return;fuelToggle.checked=new Date(v+'T00:00:00')>=new Date('2026-04-17T00:00:00')}
+function fillFBAExample(){price.value='29.99';feeDate.value='2026-09-26';actualWeight.value='12.5';actualWeightUnit.value='lb';d1.value='36';d2.value='24';d3.value='18';dimUnit.value='in';updateFuelByDate();calculateFBA()}
+function resetFBA(){
+  ['price','actualWeight','d1','d2','d3'].forEach(id=>document.getElementById(id).value='');feeDate.value='2026-09-26';actualWeightUnit.value='lb';dimUnit.value='in';updateFuelByDate();
+  ['tier','priceBand','sortedDims','lg','dimensionalWeight','shippingWeight','oversizeFlag'].forEach(id=>document.getElementById(id).textContent='—');
+  tierSub.textContent='等待计算';season.textContent='—';girth.textContent='围长 = 2 ×（次长边 + 最短边）';dimensionalFormula.textContent='长 × 宽 × 高 ÷ 139';weightSource.textContent='—';
+  fulfillmentFee.textContent='$—';fuelFee.textContent='$—';extraHandling.textContent='$—';grandTotal.textContent='$—';totalLine.textContent='$—';lastFbaTotal=null;clearRateHighlight();fbaMessage.innerHTML='';
+}
+function fbaMsg(t,type){fbaMessage.innerHTML=`<div class="notice ${type}">${t}</div>`}
+function clearRateHighlight(){document.querySelectorAll('tr.rate-match').forEach(tr=>{tr.classList.remove('rate-match');tr.querySelectorAll('td').forEach(td=>td.classList.remove('rate-col-match'));const b=tr.querySelector('.match-badge');if(b)b.remove()})}
+function highlightRateReference(seasonKey,refKey,priceIdx){
+  clearRateHighlight();const row=document.getElementById(`rate_${seasonKey}_${refKey}`);if(!row)return;row.classList.add('rate-match');
+  const c=row.querySelectorAll('td')[2+priceIdx];if(c)c.classList.add('rate-col-match');const first=row.querySelector('td');if(first){const b=document.createElement('span');b.className='match-badge';b.textContent='当前匹配';first.appendChild(b)}
+  const det=document.getElementById(seasonKey==='peak'?'peakDetails':'offDetails');if(det)det.open=true;setTimeout(()=>row.scrollIntoView({behavior:'smooth',block:'center'}),80);
+}
+function renderRateTables(){
+  function tableFor(s){
+    const rows=[];standardBands.small.forEach((r,i)=>rows.push({key:`small_${i}`,cells:['小号标准尺寸',r.label,...r[s].map(money)]}));
+    standardBands.large.forEach((r,i)=>rows.push({key:`large_${i}`,cells:['大号标准尺寸',r.label,...r[s].map(money)]}));
+    rows.push({key:'large_over3',cells:['大号标准尺寸','>3–20 lb',money(variableRates[s].largeOver3[0])+' + $0.08/4oz',money(variableRates[s].largeOver3[1])+' + $0.08/4oz',money(variableRates[s].largeOver3[2])+' + $0.08/4oz']});
+    [['smallBulky','小号大件','0–50 lb','$0.38/lb over 1 lb'],['largeBulky','大号大件','0–50 lb','$0.38/lb over 1 lb'],['xl0','超大件','0–50 lb','$0.38/lb over 1 lb'],['xl50','超大件','>50–70 lb','$0.75/lb over 51 lb'],['xl70','超大件','>70–150 lb','$0.75/lb over 71 lb'],['xl150','超大件','>150 lb','$0.19/lb over 151 lb']].forEach(([k,n,w,a])=>rows.push({key:k,cells:[n,w,money(variableRates[s][k][0])+' + '+a,money(variableRates[s][k][1])+' + '+a,money(variableRates[s][k][2])+' + '+a]}));
+    return `<div class="table-wrap"><table><thead><tr><th>尺寸分段</th><th>发货重量</th><th>&lt;$10</th><th>$10–$50</th><th>&gt;$50</th></tr></thead><tbody>${rows.map(r=>`<tr id="rate_${s}_${r.key}">`+r.cells.map(x=>`<td>${x}</td>`).join('')+'</tr>').join('')}</tbody></table></div>`;
+  }
+  offpeakTable.innerHTML=tableFor('off');peakTable.innerHTML=tableFor('peak');
+}
+
+/* ---------- Profit calculator ---------- */
+const scenarioNames={air:'空运',seaair:'海派',sea:'海运'};
+function scenarioData(k){
+  const price=num('p_'+k),fba=num('fba_'+k),freight=num('freight_'+k),purchaseRmb=num('purchase_'+k),fxv=num('fx')||1;
+  const commission=price*num('commissionRate'),salesTax=price*num('salesTaxRate'),purchaseUsd=purchaseRmb/fxv,importTax=price*num('importTaxRate'),ad=price*num('adRate'),returns=price*num('returnRate');
+  const gross=price-commission-salesTax-fba-freight-purchaseUsd-importTax-ad-returns;
+  const grossRate=price?gross/price:0;
+  const withdraw=Math.max(0,(price-commission-salesTax-fba-ad-returns)*num('withdrawRate'));
+  const profit=gross-withdraw-num('mgmtFee'),profitRate=price?profit/price:0;
+  return{price,fba,freight,purchaseRmb,purchaseUsd,commission,salesTax,importTax,ad,returns,gross,grossRate,withdraw,mgmt:num('mgmtFee'),profit,profitRate};
+}
+function renderScenario(k,d){
+  const cl=d.profit>=0?'positive':'negative';
+  document.getElementById('panel_'+k).innerHTML=`
+    <div class="calc-line"><span>采购价 USD</span><strong>${money(d.purchaseUsd)}</strong></div>
+    <div class="calc-line"><span>AMZ 佣金</span><strong>${money(d.commission)}</strong></div>
+    <div class="calc-line"><span>消费税</span><strong>${money(d.salesTax)}</strong></div>
+    <div class="calc-line"><span>进口税</span><strong>${money(d.importTax)}</strong></div>
+    <div class="calc-line"><span>广告费</span><strong>${money(d.ad)}</strong></div>
+    <div class="calc-line"><span>退货成本</span><strong>${money(d.returns)}</strong></div>
+    <div class="calc-line"><span>毛利</span><strong>${money(d.gross)} / ${pct(d.grossRate)}</strong></div>
+    <div class="calc-line"><span>提现费</span><strong>${money(d.withdraw)}</strong></div>
+    <div class="calc-line"><span>管理费用</span><strong>${money(d.mgmt)}</strong></div>
+    <div class="calc-line profit-final"><span>利润 / 利润率</span><strong class="${cl}">${money(d.profit)} / ${pct(d.profitRate)}</strong></div>`;
+}
+function calcProfit(){
+  const keys=['air','seaair','sea'],data={};keys.forEach(k=>{data[k]=scenarioData(k);renderScenario(k,data[k])});
+  profitSummary.innerHTML=keys.map(k=>{const d=data[k],cl=d.profit>=0?'positive':'negative';return `<div class="summary-card"><div class="name">${scenarioNames[k]}</div><div class="big ${cl}">${money(d.profit)}</div><div class="small">利润率 ${pct(d.profitRate)} · 毛利 ${money(d.gross)}</div></div>`}).join('');
+}
+function syncFBAFee(){
+  if(lastFbaTotal===null){profitMessage.innerHTML='<div class="notice warn">请先到「FBA 配送费计算器」完成一次计算，再引用结果。</div>';return}
+  ['air','seaair','sea'].forEach(k=>document.getElementById('fba_'+k).value=lastFbaTotal.toFixed(2));calcProfit();
+  profitMessage.innerHTML=`<div class="notice ok">已将当前配送相关费用 ${money(lastFbaTotal)} 带入三种方案的「AMZ 物流」。</div>`;
+}
+function resetProfit(){
+  fx.value='6.7';sku.value='5';productDesc.value='5';mgmtFee.value='1.49';commissionRate.value='0.15';salesTaxRate.value='0';importTaxRate.value='0.05';adRate.value='0.15';returnRate.value='0.03';withdrawRate.value='0.005';
+  p_air.value='26.99';fba_air.value='5.76';freight_air.value='3.99';purchase_air.value='34.90';
+  p_seaair.value='26.99';fba_seaair.value='5.76';freight_seaair.value='1.59';purchase_seaair.value='34.90';
+  p_sea.value='24.99';fba_sea.value='5.76';freight_sea.value='0.84';purchase_sea.value='34.90';
+  profitMessage.innerHTML='';calcProfit();
+}
+
+
+/* ---------- Advertising campaign name generator ---------- */
+function adDateString(){
+  const d=new Date();
+  const yyyy=d.getFullYear();
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  const dd=String(d.getDate()).padStart(2,'0');
+  return `${yyyy}${mm}${dd}`;
+}
+function normalizeAdsSku(v){
+  return String(v||'').trim().replace(/\s+/g,'-').replace(/_+/g,'-');
+}
+function generateAdName(){
+  const sku=normalizeAdsSku(document.getElementById('adsSku').value);
+  const raw=document.getElementById('adsType').value;
+  const objective=document.getElementById('adsObjective').value;
+  if(!sku){
+    adsNameMessage.innerHTML='<div class="notice warn">请输入产品 SKU。</div>';
+    return;
+  }
+  const [adType,targeting,detail]=raw.split('|');
+  adsCampaignName.textContent=`US_${adType}_${sku}_${targeting}_${detail}_${objective}_${adDateString()}`;
+  adsNameMessage.innerHTML='<div class="notice ok">广告活动名称已生成。</div>';
+}
+async function copyAdName(){
+  if(!document.getElementById('adsSku').value.trim()){
+    generateAdName();
+    return;
+  }
+  generateAdName();
+  const v=adsCampaignName.textContent.trim();
+  try{
+    await navigator.clipboard.writeText(v);
+  }catch(e){
+    const ta=document.createElement('textarea');
+    ta.value=v;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+  }
+  adsNameMessage.innerHTML='<div class="notice ok">已复制到剪贴板。</div>';
+}
+function resetAdName(){
+  adsSku.value='';
+  adsType.selectedIndex=0;
+  adsObjective.selectedIndex=0;
+  adsCampaignName.textContent='US_SP_PD-HBD-MRY-01_AUTO_Close_Launch_YYYYMMDD';
+  adsNameMessage.innerHTML='';
+}
+
+
+/* ---------- Promotion max-price calculator ---------- */
+function promoNum(id){
+  const v=parseFloat(document.getElementById(id).value);
+  return Number.isFinite(v)?v:NaN;
+}
+function promoMoney(n){
+  return Number.isFinite(n)?'$'+n.toFixed(2):'$—';
+}
+function calcPromo(){
+  const site=document.getElementById('promoSite').value;
+  const your=promoNum('promoYourPrice');
+  const list=promoNum('promoListPrice');
+  const was=promoNum('promoWasPrice');
+  const d30all=promoNum('promo30All');
+  const d30reg=promoNum('promo30Regular');
+  const d60all=promoNum('promo60All');
+
+  if([your,list,was,d30all,d30reg,d60all].some(x=>!Number.isFinite(x)||x<0)){
+    document.getElementById('promoMessage').innerHTML='<div class="notice err">请完整填写 6 个价格字段，并确保数值不小于 0。</div>';
+    return;
+  }
+  if(was===0){
+    document.getElementById('promoMessage').innerHTML='<div class="notice err">历史售价（Was Price）不能为 0，否则优惠券验证无法计算。</div>';
+    return;
+  }
+
+  const dailyZ=Math.min(list*(1-.10),was-.01,d30all);
+  const dailyDeal=Math.min(list*(1-.15),was-.01,d30all);
+
+  let dailyDiscount,dailyCoupon;
+  if(site==='CA'){
+    dailyDiscount=Math.min(list*(1-.05),your*(1-.05),d30reg*(1-.05),was-.01);
+    dailyCoupon=Math.min(list*(1-.05),was-.01);
+  }else{
+    dailyDiscount=Math.min(list*(1-.05),your*(1-.05),d30reg*(1-.05));
+    dailyCoupon=Math.min(list*(1-.05),was*(1-.05));
+  }
+
+  const validation=(your-was)/was;
+  const eventZ=Math.min(list*(1-.15),was*(1-.05),d30all*(1-.05),d60all);
+  const eventDeal=Math.min(list*(1-.20),was*(1-.05),d30all*(1-.05),d60all);
+  const eventDiscount=Math.min(list*(1-.15),was*(1-.05),d30all*(1-.05),d60all,your*(1-.20));
+
+  document.getElementById('promoDailyZ').textContent=promoMoney(dailyZ);
+  document.getElementById('promoDailyDeal').textContent=promoMoney(dailyDeal);
+  document.getElementById('promoDailyDiscount').textContent=promoMoney(dailyDiscount);
+  document.getElementById('promoDailyCoupon').textContent=promoMoney(dailyCoupon);
+  document.getElementById('promoEventZ').textContent=promoMoney(eventZ);
+  document.getElementById('promoEventDeal').textContent=promoMoney(eventDeal);
+  document.getElementById('promoEventDiscount').textContent=promoMoney(eventDiscount);
+
+  const valEl=document.getElementById('promoCouponValidation');
+  const helpEl=document.getElementById('promoCouponValidationHelp');
+  valEl.textContent=(validation*100).toFixed(2)+'%';
+  if(validation>0.30){
+    valEl.className='pv-value negative';
+    helpEl.textContent='超过 30%：按 Excel 标注的验证规则，需要重点检查当前价格与历史售价关系。';
+  }else{
+    valEl.className='pv-value positive';
+    helpEl.textContent='≤ 30%：符合 Excel 中“当前价格至多比历史售价高 30%”的验证提示。';
+  }
+
+  document.getElementById('promoSiteResult').textContent=site;
+  document.getElementById('promoDiscountRule').textContent=
+    site==='CA'?'额外受 Was−$0.01 限制':'不含 Was−$0.01';
+  document.getElementById('promoCouponRule').textContent=
+    site==='CA'?'MIN(List×95%, Was−$0.01)':'MIN(List×95%, Was×95%)';
+
+  document.getElementById('promoMessage').innerHTML='<div class="notice ok">计算完成。结果已按 '+site+' 对应的 Sheet1 公式更新。</div>';
+}
+function fillPromoExample(site){
+  promoSite.value=site;
+  if(site==='CA'){
+    promoYourPrice.value='79.99';
+    promoListPrice.value='69.99';
+    promoWasPrice.value='69.99';
+    promo30All.value='59.99';
+    promo30Regular.value='79.99';
+    promo60All.value='59.99';
+  }else{
+    promoYourPrice.value='69.99';
+    promoListPrice.value='69.99';
+    promoWasPrice.value='59.99';
+    promo30All.value='59.98';
+    promo30Regular.value='69.99';
+    promo60All.value='59.98';
+  }
+  calcPromo();
+}
+function resetPromo(){
+  promoSite.value='US';
+  promoYourPrice.value='';
+  promoListPrice.value='';
+  promoWasPrice.value='';
+  promo30All.value='';
+  promo30Regular.value='';
+  promo60All.value='';
+  ['promoDailyZ','promoDailyDeal','promoDailyDiscount','promoDailyCoupon','promoEventZ','promoEventDeal','promoEventDiscount'].forEach(id=>{
+    document.getElementById(id).textContent='$—';
+  });
+  promoCouponValidation.textContent='—';
+  promoCouponValidation.className='pv-value';
+  promoCouponValidationHelp.textContent='Excel 规则提示：当前价格至多比历史售价高 30%。';
+  promoSiteResult.textContent='US';
+  promoDiscountRule.textContent='US Rule';
+  promoCouponRule.textContent='US Rule';
+  promoMessage.innerHTML='';
+}
+
+/* ---------- init ---------- */
+feeDate.addEventListener('change',updateFuelByDate);
+feeDate.value='2026-09-26';updateFuelByDate();renderRateTables();calcProfit();
+adsSku.addEventListener('keydown',e=>{if(e.key==='Enter')generateAdName()});
+calcPromo();
+</script>
+</body>
+</html>
